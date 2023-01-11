@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspNetNewsAgregator.Core\AspNetNewsAgregator.Core.csproj" />
+    <ProjectReference Include="..\AspNetNewsAgregator.DataBase\AspNetNewsAgregator.DataBase.csproj" />
   </ItemGroup>
 
 </Project>

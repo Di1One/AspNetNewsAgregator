@@ -1,6 +1,9 @@
 using AspNetNewsAgregator.Business.ServicesImplementations;
 using AspNetNewsAgregator.Core;
 using AspNetNewsAgregator.Core.Abstractions;
+using AspNetNewsAgregator.DataBase;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace AspNetNewsAgregatorMvcApp
 {
@@ -12,8 +15,14 @@ namespace AspNetNewsAgregatorMvcApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddTransient<IArticleService, ArticleService>();
-            builder.Services.AddSingleton<ArticlesStorage>();
+
+            var connectionString = "Server=L340;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;TrustServerCertificate=True";
+            builder.Services.AddDbContext<GoodNewsAggregatorContext>(
+                optionsBuilder => optionsBuilder.UseSqlServer(connectionString));
+
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            builder.Services.AddScoped<IArticleService, ArticleService>();
 
             var app = builder.Build();
 

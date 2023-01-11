@@ -1,6 +1,7 @@
 ﻿using AspNetNewsAgregator.Business.ServicesImplementations;
 using AspNetNewsAgregator.Core;
 using AspNetNewsAgregator.Core.Abstractions;
+using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregatorMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
             _articleService = articleService;
         }
 
-        public async Task<IActionResult> IndexAsync(int page)
+        public async Task<IActionResult> Index(int page)
         {
             try
             {
@@ -41,9 +42,18 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
+            var dto = await _articleService.GetArticleByIdAsync(id);
+            if (dto != null)
+            {
+                //ViewData["model"] = dto;
+                //ViewBag.Model = dto;
 
-
-            return Ok();
+                return View(dto);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet]
@@ -57,6 +67,5 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
         {
             return Ok();
         }
-
     }
 }

@@ -1,25 +1,20 @@
-﻿@model IEnumerable<AspNetNewsAgregator.Core.DataTransferObjects.ArticleDto>
+﻿@using AspNetNewsAgregatorMvcApp.Helpers;
+@model IEnumerable<AspNetNewsAgregator.Core.DataTransferObjects.ArticleDto>
 
 @{
     ViewData["Title"] = "View";
+    //Layout = "_CustomLayout";
 }
 
 <h1>Articles</h1>
 
-@foreach (var item in Model) 
+
+@if (Model.Any())
 {
-        <div>
-            <h3>
-                @Html.DisplayFor(modelItem => item.Title)
-            </h3>
-            <h4>
-                @Html.DisplayFor(modelItem => item.Category)
-            </h4>
-            <p>
-                @Html.DisplayFor(modelItem => item.ShortSummary)
-            </p>
-            <h6>
-                @Html.DisplayFor(modelItem => item.PublicationDate)
-            </h6>
-        </div>
+    @foreach (var item in Model)
+    {
+        @await Html.PartialAsync("ArticlePreview", item)
+    }
 }
+
+@PaginatorHelper.GeneratePaginator()

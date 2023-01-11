@@ -1,0 +1,22 @@
+﻿@using AspNetNewsAgregator.Core.DataTransferObjects;
+
+@model ArticleDto
+
+
+<div>
+            <h3>
+        @Html.DisplayFor(modelItem => Model.Title)
+            </h3>
+            <h4>
+        @Html.DisplayFor(modelItem => Model.Category)
+            </h4>
+            <i>@Html.DisplayFor(modelItem => Model.Id)</i>
+            <p>
+        @Html.DisplayFor(modelItem => Model.ShortSummary)
+            </p>
+            <h6>
+        @Html.DisplayFor(modelItem => Model.PublicationDate)
+            </h6>
+            <a class="btn btn-primary" href="~/article/details/@Model.Id">Read details</a>
+        </div> 
+        <hr>

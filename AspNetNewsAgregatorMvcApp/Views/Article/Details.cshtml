@@ -1,0 +1,39 @@
+﻿@using AspNetNewsAgregator.Core.DataTransferObjects;
+
+@model ArticleWithCommentViewModel
+
+@{
+    //var item = (ViewData["model"] as ArticleDto);
+    //var item = ViewBag.Model;
+    ViewData["Title"] = "Article details";
+}
+
+
+<div>
+           <h3> 
+                @Model?.Article.Title
+            </h3>
+            <h5> 
+                @Model?.Article.Category
+            </h5>
+            <div>
+            <p>
+        
+               @Model?.Article.Text
+            </p>
+            </div>
+            <h6>
+          
+                @Model?.Article.PublicationDate
+            </h6>
+</div>
+<hr>
+
+<div>
+    <h3>Comments</h3>
+
+    @foreach (var comment in Model.Comments)
+    {
+            <p>comment</p>
+    }
+</div>

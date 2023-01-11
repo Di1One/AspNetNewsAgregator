@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetNewsAgregatorMvcApp", "AspNetNewsAgregatorMvcApp\AspNetNewsAgregatorMvcApp.csproj", "{697BB5AA-F126-4697-B618-798787128A04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetNewsAgregator.Core", "AspNetNewsAgregator.Core\AspNetNewsAgregator.Core.csproj", "{8D0AFB71-3D72-4634-B84C-BB087D315853}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetNewsAgregator.Business", "AspNetNewsAgregator.Business\AspNetNewsAgregator.Business.csproj", "{70D84201-521B-4C95-BE39-2898131C6E12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{697BB5AA-F126-4697-B618-798787128A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{697BB5AA-F126-4697-B618-798787128A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{697BB5AA-F126-4697-B618-798787128A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{697BB5AA-F126-4697-B618-798787128A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D0AFB71-3D72-4634-B84C-BB087D315853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D0AFB71-3D72-4634-B84C-BB087D315853}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D0AFB71-3D72-4634-B84C-BB087D315853}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D0AFB71-3D72-4634-B84C-BB087D315853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70D84201-521B-4C95-BE39-2898131C6E12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70D84201-521B-4C95-BE39-2898131C6E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70D84201-521B-4C95-BE39-2898131C6E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70D84201-521B-4C95-BE39-2898131C6E12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B98B3062-4D51-442B-9460-50BC9162A12E}
+	EndGlobalSection
+EndGlobal

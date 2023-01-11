@@ -1,0 +1,25 @@
+﻿@model IEnumerable<AspNetNewsAgregator.Core.DataTransferObjects.ArticleDto>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>Articles</h1>
+
+@foreach (var item in Model) 
+{
+        <div>
+            <h3>
+                @Html.DisplayFor(modelItem => item.Title)
+            </h3>
+            <h4>
+                @Html.DisplayFor(modelItem => item.Category)
+            </h4>
+            <p>
+                @Html.DisplayFor(modelItem => item.ShortSummary)
+            </p>
+            <h6>
+                @Html.DisplayFor(modelItem => item.PublicationDate)
+            </h6>
+        </div>
+}

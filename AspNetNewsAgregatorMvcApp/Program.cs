@@ -1,9 +1,9 @@
 using AspNetNewsAgregator.Business.ServicesImplementations;
-using AspNetNewsAgregator.Core;
 using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.DataBase;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
 
 namespace AspNetNewsAgregatorMvcApp
 {
@@ -12,6 +12,12 @@ namespace AspNetNewsAgregatorMvcApp
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog((ctx, lc) => 
+            lc.WriteTo.File(
+                @"C:\Users\Admi\Desktop\Новая папка\logs\data.log",
+                LogEventLevel.Information)
+                .WriteTo.Console(LogEventLevel.Verbose));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

@@ -1,9 +1,7 @@
-﻿using AspNetNewsAgregator.Business.ServicesImplementations;
-using AspNetNewsAgregator.Core;
-using AspNetNewsAgregator.Core.Abstractions;
-using AspNetNewsAgregator.Core.DataTransferObjects;
+﻿using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregatorMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace AspNetNewsAgregatorMvcApp.Controllers
 {
@@ -30,13 +28,13 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
                }
                else
                {
-                    return View("NoArtilces");
+                    throw new ArgumentException(nameof(page));
                }
             }
             catch (Exception ex)
             {
-                //logger
-                throw new Exception();
+                Log.Error($"{ex.Message}. {Environment.NewLine} {ex.StackTrace}");
+                return BadRequest();
             }
         }
 

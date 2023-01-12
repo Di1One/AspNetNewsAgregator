@@ -16,13 +16,16 @@ namespace AspNetNewsAgregatorMvcApp
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            var connectionString = "Server=L340;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;TrustServerCertificate=True";
+            var connectionString = builder.Configuration.GetConnectionString("Default");
+                //"Server=L340;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;TrustServerCertificate=True";
             builder.Services.AddDbContext<GoodNewsAggregatorContext>(
                 optionsBuilder => optionsBuilder.UseSqlServer(connectionString));
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             builder.Services.AddScoped<IArticleService, ArticleService>();
+
+            builder.Configuration.AddJsonFile("secrets.json");
 
             var app = builder.Build();
 

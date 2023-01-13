@@ -4,6 +4,8 @@ using AspNetNewsAgregator.DataBase;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using AspNetNewsAgregator.DataBase.Entities;
+using System.Collections.Generic;
 
 namespace AspNetNewsAgregator.Business.ServicesImplementations
 {
@@ -49,11 +51,25 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
         }
         public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
         {
-            var dto = new ArticleDto();  
-                /*_articlesStorage.ArticlesList
-                .FirstOrDefault(articleDto => articleDto.Id.Equals(id)); */
+            var entity = await _databaseContext.Articles.FirstOrDefaultAsync(article => article.Id.Equals(id));
+            var dto = _mapper.Map<ArticleDto>(entity);
 
             return dto;
+        }
+        public async Task<int> CreateArticleAsync(ArticleDto dto)
+        {
+            var entity = _mapper.Map<Article>(dto);  
+
+            if (entity != null)
+            {
+                await _databaseContext.Articles.AddAsync(entity);
+                var addingResult = await _databaseContext.SaveChangesAsync();
+                return addingResult;
+            }
+            else
+            {
+                throw new ArgumentException(nameof(dto));
+            }
         }
     }
 }

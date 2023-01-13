@@ -12,5 +12,6 @@ namespace AspNetNewsAgregator.Core.Abstractions
         Task<List<ArticleDto>> GetArticlesByPageNumberAndPageSizeAsync(int pageNumber, int pageSize);
         Task<List<ArticleDto>> GetNewArticlesFromExternalSourcesAsync();
         Task<ArticleDto> GetArticleByIdAsync(Guid id);
+        Task<int> CreateArticleAsync(ArticleDto dto);
     }
 }

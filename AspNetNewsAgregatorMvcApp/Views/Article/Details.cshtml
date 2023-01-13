@@ -1,6 +1,6 @@
 ﻿@using AspNetNewsAgregator.Core.DataTransferObjects;
 
-@model ArticleWithCommentViewModel
+@model ArticleDto
 
 @{
     //var item = (ViewData["model"] as ArticleDto);
@@ -11,29 +11,41 @@
 
 <div>
            <h3> 
-                @Model?.Article.Title
+                @Model?.Title
             </h3>
             <h5> 
-                @Model?.Article.Category
+                @Model?.Category
             </h5>
             <div>
             <p>
         
-               @Model?.Article.Text
+               @Model?.Text
             </p>
             </div>
             <h6>
           
-                @Model?.Article.PublicationDate
+                @Model?.PublicationDate
             </h6>
 </div>
+
+@*@Html.DisplayForModel()*@
+
 <hr>
 
-<div>
+
+<div class="btn-group" role="group">
+    @Html.ActionLink("Edit", "Edit", "Article", new {id = Model.Id}, new {@class="btn btn-warning"})
+
+    <a asp-controller="Article" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+
+    <a type="button" class="btn btn-danger">Delete</a> 
+</div>
+
+@*<div>
     <h3>Comments</h3>
 
     @foreach (var comment in Model.Comments)
     {
             <p>comment</p>
     }
-</div>
+</div>*@ 

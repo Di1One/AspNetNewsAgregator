@@ -1,0 +1,29 @@
+﻿@using AspNetNewsAgregator.Core;
+@model CreateSourceModel
+@{
+    ViewData["Title"] = "CreateArticle";
+}
+
+<div>
+    <h1>Create article</h1>
+
+    <form asp-controller="Source" asp-action="Create" method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input asp-for="Name" class="form-control" id="name">
+        </div>
+        <div class="mb-3">
+            <label for="url" class="form-label">Url</label>
+            <input asp-for="Url" class="form-control" id="url">
+        </div>
+        <div class="mb-3">
+            <label for="sourceType" class="form-label">Source type</label>
+           <select asp-for="SourceType" asp-items="Html.GetEnumSelectList<SourceType>()" id="sourceType">
+               <option selected="selected" disabled="disabled">Select Source Type</option>
+           </select>
+        </div>
+
+        <input type="submit" class="btn btn-primary">Submit>
+
+    </form>
+</div>

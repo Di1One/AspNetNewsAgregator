@@ -1,0 +1,19 @@
+﻿@model List<SourceModel>
+
+@{
+    ViewData["Title"] = "Sources";
+}
+
+<h1>Sources</h1>
+
+@Html.ActionLink("Create source", "Create", "Source")
+
+<a asp-action="Create" asp-controller="Source"> Create source</a>
+
+@if (Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        
+    }
+}

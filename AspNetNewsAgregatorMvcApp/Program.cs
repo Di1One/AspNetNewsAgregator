@@ -1,5 +1,8 @@
 using AspNetNewsAgregator.Business.ServicesImplementations;
 using AspNetNewsAgregator.Core.Abstractions;
+using AspNetNewsAgregator.Data.Abstractions;
+using AspNetNewsAgregator.Data.Abstractions.Repositories;
+using AspNetNewsAgregator.Data.Repositories;
 using AspNetNewsAgregator.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -31,6 +34,9 @@ namespace AspNetNewsAgregatorMvcApp
 
             builder.Services.AddScoped<IArticleService, ArticleService>(); 
             builder.Services.AddScoped<ISourceService, SourceService>();
+            builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+            builder.Services.AddScoped<ISourceRepository, SourceRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Configuration.AddJsonFile("secrets.json");
 

@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AspNetNewsAgregator.Core\AspNetNewsAgregator.Core.csproj" />
-    <ProjectReference Include="..\AspNetNewsAgregator.Data.Abstractions\AspNetNewsAgregator.Data.Abstractions.csproj" />
     <ProjectReference Include="..\AspNetNewsAgregator.DataBase\AspNetNewsAgregator.DataBase.csproj" />
   </ItemGroup>
 

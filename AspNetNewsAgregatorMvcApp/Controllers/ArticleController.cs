@@ -80,10 +80,16 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
         {
             try
             {
-                if (model != null)
+                if (ModelState.IsValid)
                 {
-                    model.Id= Guid.NewGuid();
-                    model.PublicationDate= DateTime.Now;
+                    if (model.Title.ToUpperInvariant().Contains("123"))
+                    {
+                        ModelState.AddModelError("Title", "Article contains 123");
+                        return View(model);
+                    }
+
+                    model.Id = Guid.NewGuid();
+                    model.PublicationDate = DateTime.Now;
 
                     var dto = _mapper.Map<ArticleDto>(model);
 
@@ -93,7 +99,7 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return View(model);
                 }
             }
             catch (Exception ex)

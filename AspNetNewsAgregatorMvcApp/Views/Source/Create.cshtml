@@ -1,16 +1,16 @@
 ﻿@using AspNetNewsAgregator.Core;
 @model CreateSourceModel
 @{
-    ViewData["Title"] = "CreateArticle";
+    ViewData["Title"] = "CreateSource";
 }
 
 <div>
-    <h1>Create article</h1>
+    <h1>Create source</h1>
 
     <form asp-controller="Source" asp-action="Create" method="post">
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input asp-for="Name" class="form-control" id="name">
+            <input asp-for="Name" class="form-control" id="name" required>
         </div>
         <div class="mb-3">
             <label for="url" class="form-label">Url</label>

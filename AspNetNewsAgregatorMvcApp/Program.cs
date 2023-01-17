@@ -4,6 +4,7 @@ using AspNetNewsAgregator.Data.Abstractions;
 using AspNetNewsAgregator.Data.Abstractions.Repositories;
 using AspNetNewsAgregator.Data.Repositories;
 using AspNetNewsAgregator.DataBase;
+using AspNetNewsAgregator.DataBase.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -34,6 +35,8 @@ namespace AspNetNewsAgregatorMvcApp
 
             builder.Services.AddScoped<IArticleService, ArticleService>(); 
             builder.Services.AddScoped<ISourceService, SourceService>();
+            builder.Services.AddScoped<IAdditionalArticleRepository, ArticleGenericRepository>();
+            builder.Services.AddScoped<IRepository<Source>, Repository<Source>>();
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

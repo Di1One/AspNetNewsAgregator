@@ -1,6 +1,6 @@
 ﻿namespace AspNetNewsAgregator.DataBase.Entities
 {
-    public class Article
+    public class Article : IBaseEntity
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

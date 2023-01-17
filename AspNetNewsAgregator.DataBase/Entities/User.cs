@@ -1,6 +1,6 @@
 ﻿namespace AspNetNewsAgregator.DataBase.Entities
 {
-    public class User
+    public class User : IBaseEntity
     {
         public Guid Id { get; set; }
         public string Email { get; set; }

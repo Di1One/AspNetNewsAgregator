@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AspNetNewsAgregator.Data.Repositories
 {
-    public class SourceRepository : ISourceRepository // CRUD operations with Articles Table in DB
+    public class SourceRepository : ISourceRepository
     {
         private readonly GoodNewsAggregatorContext _database;
         

@@ -1,4 +1,5 @@
-﻿using AspNetNewsAgregator.Core.DataTransferObjects;
+﻿using AspNetNewsAgregator.Core;
+using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.Data.Abstractions;
 using AspNetNewsAgregator.Data.Abstractions.Repositories;
@@ -30,7 +31,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 var passwordSalt = _configuration["UserSecrets:PasswordSalt"];
 
                 var list = await _unitOfWork.Articles
-                    .GetArticlesAsQueryable()
+                    .Get()
                     .Skip(pageNumber * pageSize)
                     .Take(pageSize)
                     .Select(article => _mapper.Map<ArticleDto>(article))
@@ -52,7 +53,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
         }
         public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
         {
-            var entity = await _unitOfWork.Articles.GetArticleByIdAsync(id);
+            var entity = await _unitOfWork.Articles.GetByIdAsync(id);
             var dto = _mapper.Map<ArticleDto>(entity);
 
             return dto;
@@ -63,7 +64,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
             if (entity != null)
             {
-                await _unitOfWork.Articles.AddArticleAsync(entity);
+                await _unitOfWork.Articles.AddAsync(entity);
                 var addingResult = await _unitOfWork.Commit();
 
                 return addingResult;
@@ -73,10 +74,17 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 throw new ArgumentException(nameof(dto));
             }
         }
+
+        public async Task<int> PatchAsync(Guid Id, List<PatchModel> patchList)
+        {
+            await _unitOfWork.Articles.PatchAsync(Id, patchList);
+            return await _unitOfWork.Commit();
+        }
+
         public async Task Do()
         {
-            await _unitOfWork.Articles.AddArticleAsync(new Article());
-            await _unitOfWork.Sources.AddSourceAsync(new Source());
+            await _unitOfWork.Articles.AddAsync(new Article());
+            await _unitOfWork.Sources.AddAsync(new Source());
 
             await _unitOfWork.Commit();
         }

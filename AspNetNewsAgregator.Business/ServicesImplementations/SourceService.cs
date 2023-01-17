@@ -23,18 +23,18 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
         public async Task<List<SourceDto>> GetSourcesAsync()
         {
-            return await _unitOfWork.Sources.GetSourcesAsQueryable()
+            return await _unitOfWork.Sources.Get()
                 .Select(source => _mapper.Map<SourceDto>(source))
                 .ToListAsync();
         }
         public async Task<SourceDto> GetSourceByIdAsync(Guid id)
         {
-            return _mapper.Map<SourceDto>(await _unitOfWork.Sources.GetSourceByIdAsync(id));
+            return _mapper.Map<SourceDto>(await _unitOfWork.Sources.GetByIdAsync(id));
         }
         public async Task<int> CreateSourceAsync(SourceDto dto)
         {
             var entity = _mapper.Map<Source>(dto);
-            await _unitOfWork.Sources.AddSourceAsync(entity);
+            await _unitOfWork.Sources.AddAsync(entity);
             return await _unitOfWork.Commit();
         }
     }

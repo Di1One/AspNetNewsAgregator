@@ -1,9 +1,9 @@
-﻿using AspNetNewsAgregator.Core.Abstractions;
+﻿using AspNetNewsAgregator.Core;
+using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregatorMvcApp.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
 
 namespace AspNetNewsAgregatorMvcApp.Controllers
@@ -138,7 +138,25 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
                 {
                     var dto = _mapper.Map<ArticleDto>(model);
 
-                    //await _articleService.CreateArticleAsync(dto);
+                    var sourceDto = await _articleService.GetArticleByIdAsync(model.Id);
+
+                    //should be sure that dto property is the same with entity property naming 
+                    var patchList = new List<PatchModel>();
+                    if (dto != null)
+                    {
+                        if (dto.Title.Equals(sourceDto.Title))
+                        {
+                            patchList.Add(new PatchModel()
+                            {
+                                PropertyName = nameof(dto.Title),
+                                PropertyValue = dto.Title
+                            });
+                        }
+                    }
+
+                    await _articleService.PatchAsync(model.Id, patchList);
+
+                    //await _articleService.CreateArticleAsync(dto); 
 
                     return RedirectToAction("Index", "Article");
                 }

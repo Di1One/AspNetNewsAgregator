@@ -1,9 +1,12 @@
 ﻿using AspNetNewsAgregatorMvcApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using AspNetNewsAgregatorMvcApp.Filters;
 
 namespace AspNetNewsAgregatorMvcApp.Controllers
 {
+    //[CustomActionFilter]
+    [InternetExplorerBlockerFilter]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -13,11 +16,14 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
             _logger = logger;
         }
 
+        [AddDataToResponseHeaderFilter]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Route("Privacy")]
+        [HappyExceptionFilter("You'll read privacy policy in future.")]
         public IActionResult Privacy()
         {
             return View();

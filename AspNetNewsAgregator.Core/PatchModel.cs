@@ -3,5 +3,5 @@
 public class PatchModel
 {
     public string PropertyName { get; set; }
-    public object ProperyValue { get; set; }
+    public object PropertyValue { get; set; }
 }

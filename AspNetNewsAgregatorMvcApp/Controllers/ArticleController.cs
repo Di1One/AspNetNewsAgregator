@@ -1,6 +1,7 @@
 ﻿using AspNetNewsAgregator.Core;
 using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.Core.DataTransferObjects;
+using AspNetNewsAgregatorMvcApp.Filters;
 using AspNetNewsAgregatorMvcApp.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +45,9 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
             }
         }
 
-        public async Task<IActionResult> Details(Guid id)
+        [TypeFilter(typeof(ArticleCheckerActionFilter))]
+        //[ServiceFilter(typeof(ArticleCheckerActionFilter))] -> registred filter in DI
+        public async Task<IActionResult> Details(Guid id)   
         {
             var dto = await _articleService.GetArticleByIdAsync(id);
 

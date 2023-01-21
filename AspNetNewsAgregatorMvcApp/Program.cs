@@ -5,6 +5,7 @@ using AspNetNewsAgregator.Data.Abstractions.Repositories;
 using AspNetNewsAgregator.Data.Repositories;
 using AspNetNewsAgregator.DataBase;
 using AspNetNewsAgregator.DataBase.Entities;
+using AspNetNewsAgregatorMvcApp.Filters;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -24,7 +25,13 @@ namespace AspNetNewsAgregatorMvcApp
                 .WriteTo.Console(LogEventLevel.Verbose));
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+            //    options.Filters.Add<CustomActionFilter>();
+            //    // alternative options
+            //    options.Filters.Add(typeof(CustomActionFilter));
+            //    options.Filters.Add(new CustomActionFilter());
+            });
 
             var connectionString = builder.Configuration.GetConnectionString("Default");
                 //"Server=L340;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;TrustServerCertificate=True";
@@ -40,6 +47,7 @@ namespace AspNetNewsAgregatorMvcApp
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //builder.Services.AddScoped<ArticleCheckerActionFilter>(); -> registration filter for service filter
 
             builder.Configuration.AddJsonFile("secrets.json");
 

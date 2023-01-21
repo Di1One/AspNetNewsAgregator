@@ -66,7 +66,7 @@ public class Repository<T> : IRepository<T> where T : class, IBaseEntity
         var nameValuePropertiesPairs = patchData
             .ToDictionary(
                 patchModel => patchModel.PropertyName,
-                patchModel => patchModel.ProperyValue);
+                patchModel => patchModel.PropertyValue);
 
         var dbEntityEntry = Database.Entry(model);
         dbEntityEntry.CurrentValues.SetValues(nameValuePropertiesPairs);

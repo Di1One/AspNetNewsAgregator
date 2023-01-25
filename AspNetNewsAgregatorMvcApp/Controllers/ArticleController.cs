@@ -4,11 +4,13 @@ using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregatorMvcApp.Filters;
 using AspNetNewsAgregatorMvcApp.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace AspNetNewsAgregatorMvcApp.Controllers
 {
+    [Authorize(Roles = "User")]
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;

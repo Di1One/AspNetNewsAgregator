@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetNewsAgregatorMvcApp.Models;
 
-public class RegisterModel
+public class LoginModel
 {
     [Required]
     [EmailAddress]
@@ -15,9 +15,4 @@ public class RegisterModel
     [Required]
     [DataType(DataType.Password)]
     public string Password { get; set; }
-
-    [Required]
-    [DataType(DataType.Password)]
-    [Compare(nameof(Password))]
-    public string PasswordConfirmatoin { get; set; }
 }

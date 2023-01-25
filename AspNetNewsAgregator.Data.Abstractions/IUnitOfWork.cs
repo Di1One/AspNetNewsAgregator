@@ -7,5 +7,7 @@ public interface IUnitOfWork
 {
     IAdditionalArticleRepository Articles { get; }
     IRepository<Source> Sources{ get; }
+    IRepository<User> Users{ get; }
+    IRepository<Role> Roles{ get; }
     public Task<int> Commit(); //SaveChanges()
 }

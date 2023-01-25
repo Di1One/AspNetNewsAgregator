@@ -7,6 +7,10 @@
         public string PasswordHash { get; set; }
         public DateTime RegistrationDate { get; set; }
 
+        public Guid RoleId { get; set; }
+        public Role Role { get; set; }
+
         public List<Comment> Comments { get; set; }
+
     }
 }

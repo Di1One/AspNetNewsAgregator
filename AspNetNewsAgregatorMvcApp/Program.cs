@@ -5,7 +5,7 @@ using AspNetNewsAgregator.Data.Abstractions.Repositories;
 using AspNetNewsAgregator.Data.Repositories;
 using AspNetNewsAgregator.DataBase;
 using AspNetNewsAgregator.DataBase.Entities;
-using AspNetNewsAgregatorMvcApp.Filters;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -33,6 +33,17 @@ namespace AspNetNewsAgregatorMvcApp
             //    options.Filters.Add(new CustomActionFilter());
             });
 
+            builder.Services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                    options.LoginPath = new PathString(@"/Account/Login");
+                    options.LogoutPath = new PathString(@"/Account/Login");
+                    options.AccessDeniedPath = new PathString(@"/Account/Login");
+
+                });
+
             var connectionString = builder.Configuration.GetConnectionString("Default");
                 //"Server=L340;Database=GoodNewsAggregatorDataBase;Trusted_Connection=True;TrustServerCertificate=True";
             builder.Services.AddDbContext<GoodNewsAggregatorContext>(
@@ -42,8 +53,12 @@ namespace AspNetNewsAgregatorMvcApp
 
             builder.Services.AddScoped<IArticleService, ArticleService>(); 
             builder.Services.AddScoped<ISourceService, SourceService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IAdditionalArticleRepository, ArticleGenericRepository>();
             builder.Services.AddScoped<IRepository<Source>, Repository<Source>>();
+            builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+            builder.Services.AddScoped<IRepository<Role>, Repository<Role>>();
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -66,6 +81,7 @@ namespace AspNetNewsAgregatorMvcApp
 
             app.UseRouting();
 
+            app.UseAuthentication();  // set HttpContext.User
             app.UseAuthorization();
 
             app.MapControllerRoute(

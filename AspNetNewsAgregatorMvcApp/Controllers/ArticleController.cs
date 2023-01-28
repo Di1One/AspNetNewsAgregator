@@ -143,23 +143,7 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
                 {
                     var dto = _mapper.Map<ArticleDto>(model);
 
-                    var sourceDto = await _articleService.GetArticleByIdAsync(model.Id);
-
-                    //should be sure that dto property is the same with entity property naming 
-                    var patchList = new List<PatchModel>();
-                    if (dto != null)
-                    {
-                        if (dto.Title.Equals(sourceDto.Title))
-                        {
-                            patchList.Add(new PatchModel()
-                            {
-                                PropertyName = nameof(dto.Title),
-                                PropertyValue = dto.Title
-                            });
-                        }
-                    }
-
-                    await _articleService.PatchAsync(model.Id, patchList);
+                    await _articleService.UpdateArticleAsync(model.Id, dto);
 
                     //await _articleService.CreateArticleAsync(dto); 
 

@@ -74,9 +74,25 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             }
         }
 
-        public async Task<int> PatchAsync(Guid Id, List<PatchModel> patchList)
+        public async Task<int> UpdateArticleAsync(Guid id, ArticleDto? dto)
         {
-            await _unitOfWork.Articles.PatchAsync(Id, patchList);
+            var sourceDto = await GetArticleByIdAsync(id);
+
+            //should be sure that dto property is the same with entity property naming 
+            var patchList = new List<PatchModel>();
+            if (dto != null)
+            {
+                if (!dto.Title.Equals(sourceDto.Title))
+                {
+                    patchList.Add(new PatchModel()
+                    {
+                        PropertyName = nameof(dto.Title),
+                        PropertyValue = dto.Title
+                    });
+                }
+            }
+
+            await _unitOfWork.Articles.PatchAsync(id, patchList);
             return await _unitOfWork.Commit();
         }
 

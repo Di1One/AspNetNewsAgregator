@@ -10,12 +10,14 @@
 
 <a href="~/article/create">Create Article</a>
 
-@if (Model.Any())
-{
-    @foreach (var item in Model)
+<div class="row">
+    @if (Model.Any())
     {
-        @await Html.PartialAsync("ArticlePreview", item)
+        @foreach (var item in Model)
+        {
+            @await Html.PartialAsync("ArticlePreview", item)
+        }
     }
-}
+</div>
 
 @Html.GeneratePaginator(new int[]{1,2,3,4,5,6})

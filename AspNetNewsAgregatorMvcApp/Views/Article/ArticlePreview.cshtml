@@ -3,20 +3,26 @@
 @model ArticleDto
 
 
-<div>
-            <h3>
+<div class="col-12 col-sm-10 col-md-6 col-lg-3 col-xl-3 margin-bottom-15" id="article-preview">
+    <h3>
         @Html.DisplayFor(modelItem => Model.Title)
-            </h3>
-            <h4>
+    </h3>
+    <h5>
         @Html.DisplayFor(modelItem => Model.Category)
-            </h4>
-            <i>@Html.DisplayFor(modelItem => Model.Id)</i>
-            <p>
-        @Html.DisplayFor(modelItem => Model.ShortSummary)
-            </p>
-            <h6>
+    </h5>
+    <i>@Html.DisplayFor(modelItem => Model.Id)</i>
+    <div>
+        <p>
+            @Html.DisplayFor(modelItem => Model.ShortSummary)
+        </p>
+    </div>
+    <h6>
         @Html.DisplayFor(modelItem => Model.PublicationDate)
-            </h6>
-            <a class="btn btn-primary" href="~/article/details/@Model.Id">Read details</a>
-        </div> 
-        <hr>
+    </h6>
+
+    <div calss="row margin-0">
+        <a class="col-12 col-sm-10 btn btn-primary" href="~/article/details/@Model.Id">Read details</a>
+    </div>
+
+</div>
+@*<hr>*@

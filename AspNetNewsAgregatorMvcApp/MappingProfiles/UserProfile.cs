@@ -16,7 +16,9 @@ namespace AspNetNewsAgregatorMvcApp.MappingProfiles
                 .ForMember(ent => ent.Id, opt => opt.MapFrom(dto => Guid.NewGuid()))
                 .ForMember(ent => ent.RegistrationDate, opt => opt.MapFrom(dto => DateTime.Now)); ;
 
-            CreateMap<RegisterModel, UserDto>();
+            CreateMap<RegisterModel, UserDto>()
+                .ForMember(dto => dto.PasswordHash, opt => opt.MapFrom(model => model.Password));
+
 
             CreateMap<LoginModel, UserDto>();
         }

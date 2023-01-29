@@ -18,10 +18,11 @@ namespace AspNetNewsAgregatorMvcApp.Controllers
         private readonly IMapper _mapper;
         private int _pageSize = 5;
 
-        public ArticleController(IArticleService articleService, IMapper mapper)
+        public ArticleController(IArticleService articleService, IMapper mapper, ISourceService sourceService)
         {
             _articleService = articleService;
             _mapper = mapper;
+            _sourceService = sourceService;
         }
 
         public async Task<IActionResult> Index(int page)

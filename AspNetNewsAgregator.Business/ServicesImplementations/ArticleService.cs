@@ -100,7 +100,6 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
         {
             await _unitOfWork.Articles.AddAsync(new Article());
             await _unitOfWork.Sources.AddAsync(new Source());
-
             await _unitOfWork.Commit();
         }
     }

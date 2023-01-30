@@ -91,8 +91,6 @@ public class AccountController : Controller
         await HttpContext.SignOutAsync();
 
         return RedirectToAction("Index", "Home");
-
-
     }
 
     private async Task Authenticate(string email)
@@ -128,6 +126,7 @@ public class AccountController : Controller
         if (User.Identities.Any(identity => identity.IsAuthenticated))
         {
             var userEmail = User.Identity?.Name;
+
             if (string.IsNullOrEmpty(userEmail))
             {
                 return BadRequest();
@@ -140,12 +139,12 @@ public class AccountController : Controller
         return View();
     }
 
-
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> GetUserData()
     {
         var userEmail = User.Identity?.Name;
+
         if (string.IsNullOrEmpty(userEmail))
         {
             return BadRequest();

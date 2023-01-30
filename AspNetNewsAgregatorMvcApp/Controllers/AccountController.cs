@@ -5,6 +5,7 @@ using AspNetNewsAgregatorMvcApp.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetNewsAgregatorMvcApp.Controllers;
@@ -84,6 +85,16 @@ public class AccountController : Controller
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync();
+
+        return RedirectToAction("Index", "Home");
+
+
+    }
+
     private async Task Authenticate(string email)
     {
         var userDto = await _userService.GetUserByEmailAsync(email);
@@ -98,4 +109,50 @@ public class AccountController : Controller
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
     }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult IsLoggedIn()
+    {
+        if (User.Identities.Any(identity => identity.IsAuthenticated))
+        {
+            return Ok(true);
+        }
+
+        return Ok(false);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> UserLoginPreview()
+    {
+        if (User.Identities.Any(identity => identity.IsAuthenticated))
+        {
+            var userEmail = User.Identity?.Name;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return BadRequest();
+            }
+
+            var user = _mapper.Map<UserDataModel>(await _userService.GetUserByEmailAsync(userEmail));
+            return View(user);
+        }
+
+        return View();
+    }
+
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetUserData()
+    {
+        var userEmail = User.Identity?.Name;
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return BadRequest();
+        }
+
+        var user = _mapper.Map<UserDataModel>(await _userService.GetUserByEmailAsync(userEmail));
+        return Ok(user);
+    }
+
 }

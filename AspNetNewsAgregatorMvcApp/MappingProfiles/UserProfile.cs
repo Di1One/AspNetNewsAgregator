@@ -21,6 +21,7 @@ namespace AspNetNewsAgregatorMvcApp.MappingProfiles
 
 
             CreateMap<LoginModel, UserDto>();
+            CreateMap<UserDto, UserDataModel>();
         }
     }
 }

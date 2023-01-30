@@ -1,23 +1,61 @@
-﻿@using AspNetNewsAgregatorMvcApp.Helpers;
-@model IEnumerable<AspNetNewsAgregator.Core.DataTransferObjects.ArticleDto>
+﻿@model IEnumerable<AspNetNewsAgregator.Core.DataTransferObjects.ArticleDto>
 
 @{
     ViewData["Title"] = "View";
-    //Layout = "_CustomLayout";
+    //Layout = null;
 }
 
 <h1 id="article-header">Articles</h1>
 
-<a href="~/article/create">Create Article</a>
+
+<a href="~/article/create">Create article</a>
 
 <div class="row">
     @if (Model.Any())
     {
-        @foreach (var item in Model)
+        foreach (var item in Model)
         {
-            @await Html.PartialAsync("ArticlePreview", item)
+            @*@await Html.PartialAsync("ArticlePreview", item)*@
+            await Html.RenderPartialAsync("ArticlePreview", item);
         }
     }
 </div>
 
-@Html.GeneratePaginator(new int[]{1,2,3,4,5,6})
+<div class="row">
+    <button class="btn btn-primary col-12 col-sm-12 col-md-6 col-lg-4" onclick="changeBackgroundColorForPreviews()">
+        Change Background colors
+    </button>
+</div>
+@*@Html.GeneratePagintator(new int[]{1,2,3,4,5,6})*@
+
+
+@section CssStyles
+{
+    {
+    <style>
+        h1 {
+            color: red;
+        }
+    </style>
+    }
+}
+
+@section Scripts
+    {
+    <script src="~/js/dom-samples.js" asp-append-version="true"></script>
+}
+
+    @* Don't use logic in views
+@{
+    var x = 1;
+    var y = new List<int>()
+    {
+        1, 2, 3, 4, 5, 6
+    };
+    foreach (var i in y)
+    {
+        x += i;
+    }
+}
+<div>@x</div>
+*@

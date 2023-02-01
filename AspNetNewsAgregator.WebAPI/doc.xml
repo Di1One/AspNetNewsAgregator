@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AspNetNewsAgregator.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:AspNetNewsAgregator.WebAPI.Controllers.ArticlesController">
+            <summary>
+            Controller for work with articles
+            </summary>
+        </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.ArticlesController.GetArticleById(System.Guid)">
+            <summary>
+            Get article from storage with specified id 
+            </summary>
+            <param name="id">Id of article</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -140,7 +140,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             }
         }
 
-        public async Task GetAllArticleDataFromRssAsync(string? sourceRssUrl)
+        public async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
         {
             if (!string.IsNullOrEmpty(sourceRssUrl))
             {
@@ -152,7 +152,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
                     foreach (var item in feed.Items)
                     {
-                        //should be checked for different rss sources
+                        //should be checked for different rss sources (Onliner)
                         var articleDto = new ArticleDto()
                         {
                             Id = Guid.NewGuid(),
@@ -167,6 +167,17 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                         list.Add(articleDto);
                     }
                 }
+
+                var oldArticleUrls = await _unitOfWork.Articles.Get()
+                    .Select(article => article.SourceUrl)
+                    .Distinct()
+                    .ToArrayAsync();
+
+                var entities = list.Where(dto => !oldArticleUrls.Contains(dto.SourceUrl))
+                    .Select(dto => _mapper.Map<Article>(dto)).ToArray();
+
+                await _unitOfWork.Articles.AddRangeAsync(entities);
+                await _unitOfWork.Commit();
             }
         }
     }

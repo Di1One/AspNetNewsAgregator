@@ -81,7 +81,7 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
 
                 foreach (var source in sources)
                 {
-                    await _articleService.GetAllArticleDataFromRssAsync(source.RssUrl);
+                    await _articleService.GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
                 }
 
                 return Ok();

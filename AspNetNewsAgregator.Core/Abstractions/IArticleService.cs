@@ -16,6 +16,6 @@ namespace AspNetNewsAgregator.Core.Abstractions
         Task<int> CreateArticleAsync(ArticleDto dto);
         Task<int> UpdateArticleAsync(Guid modelId, ArticleDto? patchList);
         Task DeleteArticleAsync(Guid id);
-        Task GetAllArticleDataFromRssAsync(string? sourceRssUrl);
+        Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl);
     }
 }

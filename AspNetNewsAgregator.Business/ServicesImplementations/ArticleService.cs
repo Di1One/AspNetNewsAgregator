@@ -7,6 +7,10 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using AspNetNewsAgregator.DataBase.Entities;
+using Microsoft.IdentityModel.Tokens;
+using System.Xml;
+using System.Collections.Generic;
+using System.ServiceModel.Syndication;
 
 namespace AspNetNewsAgregator.Business.ServicesImplementations
 {
@@ -50,6 +54,30 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
             return list;
         }
+
+        public async Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? sourceId)
+        {
+            var list = new List<ArticleDto>();
+
+            var entities = _unitOfWork.Articles.Get();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                entities = entities.Where(dto => dto.Title.Contains(name));
+            }
+
+            if (sourceId!=null && !Guid.Empty.Equals(sourceId))
+            {
+                entities = entities.Where(dto => dto.SourceId.Equals(sourceId));
+            }
+
+            var result = (await entities.ToListAsync())
+                .Select(ent => _mapper.Map<ArticleDto>(ent))
+                .ToList();
+
+            return result;
+        }
+
         public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
         {
             var entity = await _unitOfWork.Articles.GetByIdAsync(id);
@@ -96,11 +124,50 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
-        public async Task Do()
+        public async Task DeleteArticleAsync(Guid id)
         {
-            await _unitOfWork.Articles.AddAsync(new Article());
-            await _unitOfWork.Sources.AddAsync(new Source());
-            await _unitOfWork.Commit();
+            var entity = await _unitOfWork.Articles.GetByIdAsync(id);
+
+            if (entity != null)
+            {
+                _unitOfWork.Articles.Remove(entity);
+
+                await _unitOfWork.Commit();
+            }
+            else
+            {
+                throw new ArgumentException("Article for removing doesn't exist", nameof(id));
+            }
+        }
+
+        public async Task GetAllArticleDataFromRssAsync(string? sourceRssUrl)
+        {
+            if (!string.IsNullOrEmpty(sourceRssUrl))
+            {
+                var list = new List<ArticleDto>();
+
+                using (var reader = XmlReader.Create(sourceRssUrl))
+                {
+                    var feed = SyndicationFeed.Load(reader);
+
+                    foreach (var item in feed.Items)
+                    {
+                        //should be checked for different rss sources
+                        var articleDto = new ArticleDto()
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = item.Title.Text,
+                            PublicationDate = item.PublishDate.UtcDateTime,
+                            ShortSummary = item.Summary.Text,
+                            Category = item.Categories.FirstOrDefault()?.Name,
+                            SourceId = sourceId,
+                            SourceUrl = item.Id
+                        };
+
+                        list.Add(articleDto);
+                    }
+                }
+            }
         }
     }
 }

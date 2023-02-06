@@ -1,5 +1,8 @@
-﻿using AspNetNewsAgregator.Core.DataTransferObjects;
+﻿using AspNetNewsAgregator.Core.Abstractions;
+using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.WebAPI.Models.Requests;
+using AspNetNewsAgregator.WebAPI.Models.Responces;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,23 +15,18 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
     [ApiController]
     public class ArticlesController : ControllerBase
     {
-        private static List<ArticleDto> Articles = new List<ArticleDto>()
+        private readonly IArticleService _articleService;
+        private readonly ISourceService _sourceService;
+        private readonly IMapper _mapper;
+
+        public ArticlesController(IArticleService articleService, 
+            ISourceService sourceService,
+            IMapper mapper)
         {
-            new ArticleDto()
-            {
-                Id = Guid.NewGuid(),
-                Text = "Some text 1",
-                Title = "Article #1",
-                Category = "Some category 1"
-            },
-            new ArticleDto()
-            {
-                Id = Guid.NewGuid(),
-                Text = "Some text 2",
-                Title = "Article #2",
-                Category = "Some category 2"
-            },
-        };
+            _articleService = articleService;
+            _sourceService = sourceService;
+            _mapper = mapper;
+        }
 
         /// <summary>
         /// Get article from storage with specified id 
@@ -38,9 +36,9 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
-        public IActionResult GetArticleById(Guid id)
+        public async Task<IActionResult> GetArticleById(Guid id)
         {
-            var article = Articles.FirstOrDefault(dto => dto.Id.Equals(id));
+            var article = await _articleService.GetArticleByIdAsync(id);
 
             if (article == null)
             {
@@ -50,71 +48,83 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
             return Ok(article);
         }
 
+        /// <summary>
+        /// Get articles by article name substring and source Id
+        /// </summary>
+        /// <param name="model">Contains article name substring and source id</param>
+        /// <returns></returns>
         [HttpGet]
-        public IActionResult GetArticles([FromQuery]GetArticlesRequestModel? model)
+        [ProducesResponseType(typeof(List<ArticleDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetArticles([FromQuery]GetArticlesRequestModel? model)
         {
-            IEnumerable<ArticleDto> articles = Articles;
+            IEnumerable<ArticleDto> articles = await _articleService
+                .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId);
 
-            if (!string.IsNullOrEmpty(model?.Name))
-            {
-                articles = articles.Where(dto => dto.Title.Equals(model.Name));
-            }
-
-            if (!string.IsNullOrEmpty(model?.Category))
-            {
-                articles = articles.Where(dto => dto.Title.Equals(model.Category));
-            }
+           
 
             return Ok(articles.ToList());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult AddArticles([FromBody]AddOrUpdateArticleRequestModel? model)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddArticles([FromBody]AddOrUpdateArticleRequestModel? model)
         {
-            if (model != null)
+            try
             {
-                var dto = new ArticleDto()
+                var sources = await _sourceService.GetSourcesAsync();
+
+                foreach (var source in sources)
                 {
-                    Id = Guid.NewGuid(),
-                    Text = "Some text add manually",
-                    Category = "Some category add manually",
-                    ShortSummary = "Some short summary add manually",
-                    Title = "New Article",
-                    PublicationDate = DateTime.Now
-                };
+                    await _articleService.GetAllArticleDataFromRssAsync(source.RssUrl);
+                }
 
-                Articles.Add(dto);
-
-                return CreatedAtAction(nameof(GetArticleById), new {id = dto.Id}, dto);
+                return Ok();
             }
-
-            return BadRequest();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorModel { Message = ex.Message });
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult UpdateArticles(Guid id, [FromBody] AddOrUpdateArticleRequestModel? model)
         {
             if (model != null)
             {
-                var oldValue = Articles.FirstOrDefault(dto => dto.Id.Equals(id));
+                //var oldValue = _articleService..FirstOrDefault(dto => dto.Id.Equals(id));
 
-                if (oldValue == null)
-                {
-                    return NotFound();
-                }
+                //if (oldValue == null)
+                //{
+                //    return NotFound();
+                //}
 
-                var newValue = new ArticleDto()
-                {
-                    Id = oldValue.Id,
-                    Text = model.Text,
-                    Category = model.Category,
-                    ShortSummary = model.ShortSummary,
-                    Title = model.Title,
-                    PublicationDate = DateTime.Now
-                };
+                //var newValue = new ArticleDto()
+                //{
+                //    Id = oldValue.Id,
+                //    Text = model.Text,
+                //    Category = model.Category,
+                //    ShortSummary = model.ShortSummary,
+                //    Title = model.Title,
+                //    PublicationDate = DateTime.Now
+                //};
 
-                Articles.Remove(oldValue);
-                Articles.Add(newValue);
+                //Articles.Remove(oldValue);
+                //Articles.Add(newValue);
 
                 return Ok();
             }
@@ -122,39 +132,55 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(ArticleDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Nullable), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult UpdateArticles(Guid id, [FromBody] PatchRequestModel? model)
         {
-            if (model != null)
-            {
-                var oldValue = Articles.FirstOrDefault(dto => dto.Id.Equals(id));
+            //if (model != null)
+            //{
+            //    //var oldValue = Articles.FirstOrDefault(dto => dto.Id.Equals(id));
 
-                if (oldValue == null)
-                {
-                    return NotFound();
-                }
+            //    //if (oldValue == null)
+            //    //{
+            //    //    return NotFound();
+            //    //}
 
-                //todo add patch implementation (change only fields from request
+            //    ////todo add patch implementation (change only fields from request
 
-                return Ok();
-            }
+            //    return Ok();
+            //}
 
             return BadRequest();
         }
 
+        /// <summary>
+        /// Delete  Article
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
-        public IActionResult UpdateArticles(Guid id)
+        [ProducesResponseType(typeof(Nullable), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorModel), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteArticles(Guid id)
         {
-            var oldValue = Articles.FirstOrDefault(dto => dto.Id.Equals(id));
-
-            if (oldValue == null)
+            try
             {
-                return NotFound();
+                await _articleService.DeleteArticleAsync(id);
+
+                return Ok();
             }
-
-            Articles.Remove(oldValue);
-
-            return Ok();
+            catch (ArgumentException ex)
+            { 
+                return BadRequest(new ErrorModel { Message = ex.Message });
+            }
         }
     }
 }

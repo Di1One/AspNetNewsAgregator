@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetNewsAgregatorMvcWithI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{6D9B2928-C63B-446A-946C-221D7E5139E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetNewsAgregator.WebAPI", "AspNetNewsAgregator.WebAPI\AspNetNewsAgregator.WebAPI.csproj", "{B875AE15-49EE-4F2C-BC62-89C70BB53707}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetNewsAgregator.WebAPI", "AspNetNewsAgregator.WebAPI\AspNetNewsAgregator.WebAPI.csproj", "{B875AE15-49EE-4F2C-BC62-89C70BB53707}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetNewsAgregator.Mappers", "AspNetNewsAgregator.Mappers\AspNetNewsAgregator.Mappers.csproj", "{F38575C4-584E-40B5-A1AB-E45A95581406}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{B875AE15-49EE-4F2C-BC62-89C70BB53707}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B875AE15-49EE-4F2C-BC62-89C70BB53707}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B875AE15-49EE-4F2C-BC62-89C70BB53707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38575C4-584E-40B5-A1AB-E45A95581406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38575C4-584E-40B5-A1AB-E45A95581406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38575C4-584E-40B5-A1AB-E45A95581406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38575C4-584E-40B5-A1AB-E45A95581406}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

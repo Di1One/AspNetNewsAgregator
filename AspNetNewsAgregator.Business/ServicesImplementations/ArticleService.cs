@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Xml;
 using System.Collections.Generic;
 using System.ServiceModel.Syndication;
+using HtmlAgilityPack;
+using System.Xml.Linq;
 
 namespace AspNetNewsAgregator.Business.ServicesImplementations
 {
@@ -124,6 +126,60 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
+        public async Task AddArticleTextToArticlesAsync()
+        {
+            var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
+                .Where(article => string.IsNullOrEmpty(article.Text))
+                .Select(article => article.Id)
+                .ToList();
+
+            foreach (var articleId in articlesWithEmptyTextIds)
+            {
+                await AddArticleTextToArticleAsync(articleId);
+            }
+        }
+
+        private async Task AddArticleTextToArticleAsync(Guid articleId)
+        {
+            try
+            {
+                var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
+
+                if (article == null)
+                {
+                    throw new ArgumentException($"Article with id:{articleId} doesn't exist", nameof(articleId));
+                }
+
+                var articleSourceUrl = article.SourceUrl;
+
+                var web = new HtmlWeb();
+                var htmlDoc = web.Load(articleSourceUrl);
+
+                var nodes = htmlDoc.DocumentNode
+                    .Descendants(0)
+                    .Where(n => n.HasClass("news-text"));
+
+                if (nodes.Any())
+                {
+                    var articleText = nodes.FirstOrDefault()?.ChildNodes
+                        .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2"))
+                            && !node.HasClass("news-reference") 
+                            && !node.HasClass("news-banner")
+                            && !node.HasClass("news-widget")
+                            && !node.HasClass("news-vote")
+                            && node.Attributes["style"] == null)
+                        .Select(node => node.OuterHtml)
+                        .Aggregate((i,j) => i + Environment.NewLine + j);
+
+                    await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
+                    await _unitOfWork.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
         public async Task DeleteArticleAsync(Guid id)
         {
             var entity = await _unitOfWork.Articles.GetByIdAsync(id);

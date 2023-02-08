@@ -1,6 +1,7 @@
 ﻿using AspNetNewsAgregator.Data.Abstractions.Repositories;
 using AspNetNewsAgregator.DataBase;
 using AspNetNewsAgregator.DataBase.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace AspNetNewsAgregator.Data.Repositories;
 
@@ -11,8 +12,13 @@ public class ArticleGenericRepository : Repository<Article>, IAdditionalArticleR
     {
     }
 
-    public void DoCustomMethod()
+    public async Task UpdateArticleTextAsync(Guid id, string text)
     {
-        throw new NotImplementedException();
+        var article = await DbSet.FirstOrDefaultAsync(a => a.Id.Equals(id));
+
+        if (article != null)
+        {
+            article.Text = text;
+        }
     }
 }

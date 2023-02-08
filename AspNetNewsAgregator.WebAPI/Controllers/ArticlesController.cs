@@ -60,36 +60,7 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
             IEnumerable<ArticleDto> articles = await _articleService
                 .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId);
 
-           
-
             return Ok(articles.ToList());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddArticles([FromBody]AddOrUpdateArticleRequestModel? model)
-        {
-            try
-            {
-                var sources = await _sourceService.GetSourcesAsync();
-
-                foreach (var source in sources)
-                {
-                    await _articleService.GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
-                }
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ErrorModel { Message = ex.Message });
-            }
         }
 
         /// <summary>

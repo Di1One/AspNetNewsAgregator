@@ -4,6 +4,26 @@
         <name>AspNetNewsAgregator.WebAPI</name>
     </assembly>
     <members>
+        <member name="T:AspNetNewsAgregator.WebAPI.Controllers.ArticleResourcesInitializerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.ArticleResourcesInitializerController.#ctor(AspNetNewsAgregator.Core.Abstractions.IArticleService,AspNetNewsAgregator.Core.Abstractions.ISourceService,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="articleService"></param>
+            <param name="sourceService"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.ArticleResourcesInitializerController.AddArticles(AspNetNewsAgregator.WebAPI.Models.Requests.AddOrUpdateArticleRequestModel)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:AspNetNewsAgregator.WebAPI.Controllers.ArticlesController">
             <summary>
             Controller for work with articles
@@ -21,13 +41,6 @@
             Get articles by article name substring and source Id
             </summary>
             <param name="model">Contains article name substring and source id</param>
-            <returns></returns>
-        </member>
-        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.ArticlesController.AddArticles(AspNetNewsAgregator.WebAPI.Models.Requests.AddOrUpdateArticleRequestModel)">
-            <summary>
-            
-            </summary>
-            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="M:AspNetNewsAgregator.WebAPI.Controllers.ArticlesController.UpdateArticles(System.Guid,AspNetNewsAgregator.WebAPI.Models.Requests.AddOrUpdateArticleRequestModel)">

@@ -2,7 +2,7 @@
 using AspNetNewsAgregator.WebAPI.Models.Requests;
 using AspNetNewsAgregator.WebAPI.Models.Responces;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetNewsAgregator.WebAPI.Controllers
@@ -46,13 +46,30 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
             // not good practice
             try
             {
-                var sources = await _sourceService.GetSourcesAsync();
+                //RecurringJob.AddOrUpdate(() => _articleService.AggregateArticlesFromExternalSourcesAsync(),
+                //    "5,10,35 10-18 * * Mon-Fri");
 
-                foreach (var source in sources)
-                {
-                    await _articleService.GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
-                    await _articleService.AddArticleTextToArticlesAsync();
-                }
+                RecurringJob.RemoveIfExists(nameof(_articleService.AggregateArticlesFromExternalSourcesAsync));
+
+                RecurringJob.AddOrUpdate(() => _articleService.GetAllArticleDataFromRssAsync(), "*/15 * * * *");
+                RecurringJob.AddOrUpdate(() => _articleService.AddArticleTextToArticlesAsync(), "*/30 * * * *");
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorModel { Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RateArticles([FromBody] AddOrUpdateArticleRequestModel? model)
+        {
+            try
+            {
+                await _articleService.AddRateToArticlesAsync();
 
                 return Ok();
             }

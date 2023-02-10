@@ -3,6 +3,7 @@ using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.WebAPI.Models.Requests;
 using AspNetNewsAgregator.WebAPI.Models.Responces;
 using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +60,9 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
         {
             IEnumerable<ArticleDto> articles = await _articleService
                 .GetArticlesByNameAndSourcesAsync(model?.Name, model?.SourceId);
+            
+            //bad practice (not to do in real pr)
+            var jobId = BackgroundJob.Enqueue(() => Console.WriteLine("12345"));
 
             return Ok(articles.ToList());
         }

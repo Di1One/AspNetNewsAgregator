@@ -10,9 +10,12 @@ using AspNetNewsAgregator.DataBase.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.Xml;
 using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.ServiceModel.Syndication;
 using HtmlAgilityPack;
 using System.Xml.Linq;
+using AspNetNewsAgregator.Business.Models;
+using Newtonsoft.Json;
 
 namespace AspNetNewsAgregator.Business.ServicesImplementations
 {
@@ -50,11 +53,16 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 throw;
             }
         }
-        public async Task<List<ArticleDto>> GetNewArticlesFromExternalSourcesAsync()
-        {
-            var list = new List<ArticleDto>();
 
-            return list;
+        public async Task AggregateArticlesFromExternalSourcesAsync()
+        {
+            var sources = await _unitOfWork.Sources.GetAllAsync();
+
+            foreach (var source in sources)
+            {
+                await GetAllArticleDataFromRssAsync(source.Id, source.RssUrl);
+                await AddArticleTextToArticlesAsync();
+            }
         }
 
         public async Task<List<ArticleDto>> GetArticlesByNameAndSourcesAsync(string? name, Guid? sourceId)
@@ -87,6 +95,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
             return dto;
         }
+
         public async Task<int> CreateArticleAsync(ArticleDto dto)
         {
             var entity = _mapper.Map<Article>(dto);  
@@ -139,47 +148,19 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             }
         }
 
-        private async Task AddArticleTextToArticleAsync(Guid articleId)
+        public async Task AddRateToArticlesAsync()
         {
-            try
+            var articlesWithEmptyRateIds = _unitOfWork.Articles.Get()
+                .Where(article => article.Rate == null && !string.IsNullOrEmpty(article.Text))
+                .Select(article => article.Id)
+                .ToList();
+
+            foreach (var articleId in articlesWithEmptyRateIds)
             {
-                var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
-
-                if (article == null)
-                {
-                    throw new ArgumentException($"Article with id:{articleId} doesn't exist", nameof(articleId));
-                }
-
-                var articleSourceUrl = article.SourceUrl;
-
-                var web = new HtmlWeb();
-                var htmlDoc = web.Load(articleSourceUrl);
-
-                var nodes = htmlDoc.DocumentNode
-                    .Descendants(0)
-                    .Where(n => n.HasClass("news-text"));
-
-                if (nodes.Any())
-                {
-                    var articleText = nodes.FirstOrDefault()?.ChildNodes
-                        .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2"))
-                            && !node.HasClass("news-reference") 
-                            && !node.HasClass("news-banner")
-                            && !node.HasClass("news-widget")
-                            && !node.HasClass("news-vote")
-                            && node.Attributes["style"] == null)
-                        .Select(node => node.OuterHtml)
-                        .Aggregate((i,j) => i + Environment.NewLine + j);
-
-                    await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
-                    await _unitOfWork.Commit();
-                }
-            }
-            catch (Exception e)
-            {
-                throw;
+                await RateArticleAsync(articleId);
             }
         }
+
         public async Task DeleteArticleAsync(Guid id)
         {
             var entity = await _unitOfWork.Articles.GetByIdAsync(id);
@@ -196,7 +177,13 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             }
         }
 
-        public async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
+        public async Task GetAllArticleDataFromRssAsync()
+        {
+            var sources = await _unitOfWork.Sources.GetAllAsync();
+
+            Parallel.ForEach(sources, (source) => GetAllArticleDataFromRssAsync(source.Id, source.RssUrl).Wait());
+        }
+        private async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
         {
             if (!string.IsNullOrEmpty(sourceRssUrl))
             {
@@ -234,6 +221,84 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
                 await _unitOfWork.Articles.AddRangeAsync(entities);
                 await _unitOfWork.Commit();
+            }
+        }
+
+        private async Task AddArticleTextToArticleAsync(Guid articleId)
+        {
+            try
+            {
+                var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
+
+                if (article == null)
+                {
+                    throw new ArgumentException($"Article with id:{articleId} doesn't exist", nameof(articleId));
+                }
+
+                var articleSourceUrl = article.SourceUrl;
+
+                var web = new HtmlWeb();
+                var htmlDoc = web.Load(articleSourceUrl);
+
+                var nodes = htmlDoc.DocumentNode
+                    .Descendants(0)
+                    .Where(n => n.HasClass("news-text"));
+
+                if (nodes.Any())
+                {
+                    var articleText = nodes.FirstOrDefault()?.ChildNodes
+                        .Where(node => (node.Name.Equals("p") || node.Name.Equals("div") || node.Name.Equals("h2"))
+                                       && !node.HasClass("news-reference")
+                                       && !node.HasClass("news-banner")
+                                       && !node.HasClass("news-widget")
+                                       && !node.HasClass("news-vote")
+                                       && node.Attributes["style"] == null)
+                        .Select(node => node.OuterHtml)
+                        .Aggregate((i, j) => i + Environment.NewLine + j);
+
+                    await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
+                    await _unitOfWork.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        private async Task RateArticleAsync(Guid articleId)
+        {
+            try
+            {
+                var article = await _unitOfWork.Articles.GetByIdAsync(articleId);
+
+                if (article == null)
+                {
+                    throw new ArgumentException($"Article with id:{articleId} doesn't exist", nameof(articleId));
+                }
+
+                using (var client = new HttpClient())
+                {
+                    var httpRequest = new HttpRequestMessage(HttpMethod.Post,
+                        new Uri(@"https://api.ispras.ru/texterra/v1/nlp?targetType=lemma&apikey=YOUR_KEY"));
+                    httpRequest.Headers.Add("Accept", "application/json");
+
+                    httpRequest.Content = JsonContent.Create(new[] { new TextRequestModel() { Text = article.Text } });
+
+                    var response = await client.SendAsync(httpRequest);
+                    var responseStr = await response.Content.ReadAsStreamAsync();
+
+                    using (var sr = new StreamReader(responseStr))
+                    {
+                        var data = await sr.ReadToEndAsync();
+
+                        var resp = JsonConvert.DeserializeObject<IsprassResponseObject[]>(data);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
             }
         }
     }

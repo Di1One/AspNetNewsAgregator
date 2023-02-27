@@ -7,9 +7,12 @@ using AspNetNewsAgregator.DataBase;
 using AspNetNewsAgregator.DataBase.Entities;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
+using System.Text;
 
 namespace AspNetNewsAgregator.WebAPI
 {
@@ -72,24 +75,43 @@ namespace AspNetNewsAgregator.WebAPI
                 options.IncludeXmlComments(builder.Configuration["XmlDoc"]);
             });
 
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(opt =>
+                {
+                    opt.RequireHttpsMetadata = false;
+                    opt.SaveToken = true;
+                    opt.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = builder.Configuration["Token:Issuer"],
+                        ValidAudience = builder.Configuration["Token:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:JwtSecret"])),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    // opt.Events = new JwtBearerEvents() { }; for work with sockets
+                });
+
             var app = builder.Build();
 
             app.UseStaticFiles();
             app.UseHangfireDashboard();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseRouting();
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.MapHangfireDashboard();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
-            app.MapHangfireDashboard();
 
             app.Run();
         }

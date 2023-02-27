@@ -26,6 +26,11 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             return await _unitOfWork.Users.Get().AnyAsync(user => user.Id.Equals(userId));
         }
 
+        public async Task<bool> IsUserExists(string email)
+        {
+            return await _unitOfWork.Users.Get().AnyAsync(user => user.Email.Equals(email));
+        }
+
         public async Task<bool> CheckUserPassword(string email, string password)
         {
             var dbPasswordHash = (await _unitOfWork.Users
@@ -54,13 +59,13 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             return await _unitOfWork.Commit();
         }
 
-        public async Task<UserDto> GetUserByEmailAsync(string email)
+        public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
             var user =await _unitOfWork.Users
                 .FindBy(us => us.Email.Equals(email), us => us.Role)
                 .FirstOrDefaultAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return user == null ? _mapper.Map<UserDto>(user) : null;
         }
 
         private string CreateMd5(string password)

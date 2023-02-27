@@ -2,6 +2,7 @@
 using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.WebAPI.Models.Requests;
 using AspNetNewsAgregator.WebAPI.Models.Responces;
+using AspNetNewsAgregator.WebAPI.Utils;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +15,14 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
     public class TokenController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
+        private readonly IJwtUtil _jwtUtil;
 
-        public TokenController(IUserService userService, IRoleService roleService, IMapper mapper)
+        public TokenController(IUserService userService, IMapper mapper, IJwtUtil jwtUtil)
         {
             _userService = userService;
-            _roleService = roleService;
             _mapper = mapper;
+            _jwtUtil = jwtUtil;
         }
 
         /// <summary>
@@ -51,7 +52,9 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
                     });
                 }
 
-                return Ok();
+                var response = _jwtUtil.GenerateToken(user);
+
+                return Ok(response);
             }
             catch (Exception e)
             {

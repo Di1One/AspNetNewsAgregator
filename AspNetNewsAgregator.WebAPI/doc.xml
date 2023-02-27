@@ -164,6 +164,20 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.TokenController.CreateJwtToken(AspNetNewsAgregator.WebAPI.Models.Requests.LoginUserRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.UserController.Create(AspNetNewsAgregator.WebAPI.Models.Requests.RegisterUserRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:AspNetNewsAgregator.WebAPI.Models.Requests.AddOrUpdateArticleRequestModel">
             <summary>
             

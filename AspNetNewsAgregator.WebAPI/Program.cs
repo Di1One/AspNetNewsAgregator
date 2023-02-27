@@ -5,6 +5,7 @@ using AspNetNewsAgregator.Data.Abstractions.Repositories;
 using AspNetNewsAgregator.Data.Repositories;
 using AspNetNewsAgregator.DataBase;
 using AspNetNewsAgregator.DataBase.Entities;
+using AspNetNewsAgregator.WebAPI.Utils;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -67,6 +68,7 @@ namespace AspNetNewsAgregator.WebAPI
             builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
             builder.Services.AddScoped<ISourceRepository, SourceRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IJwtUtil, JwtUtilSha256>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

@@ -31,6 +31,10 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
             return await _unitOfWork.Users.Get().AnyAsync(user => user.Email.Equals(email));
         }
 
+        public async Task<IEnumerable<UserDto>> GetAllUsers()
+        {
+            return (await _unitOfWork.Users.GetAllAsync()).Select(user => _mapper.Map<UserDto>(user)).ToArray();
+        }
         public async Task<bool> CheckUserPassword(string email, string password)
         {
             var dbPasswordHash = (await _unitOfWork.Users
@@ -38,22 +42,21 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 .FirstOrDefaultAsync(user => user.Email.Equals(email)))
                 ?.PasswordHash;
 
-            return dbPasswordHash != null && CreateMd5(password).Equals(dbPasswordHash);
+            return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
         public async Task<bool> CheckUserPassword(Guid userId, string password)
         {
             var dbPasswordHash = (await _unitOfWork.Users.GetByIdAsync(userId))?.PasswordHash;
 
-            return dbPasswordHash != null && CreateMd5(password).Equals(dbPasswordHash);
+            return dbPasswordHash != null && CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}").Equals(dbPasswordHash);
         }
 
-        public async Task<int> RegisterUser(UserDto dto)
+        public async Task<int> RegisterUser(UserDto dto, string password)
         { 
             var user = _mapper.Map<User>(dto);
 
-            // can be refactored 
-            user.PasswordHash = CreateMd5(dto.PasswordHash);
+            user.PasswordHash = CreateMd5($"{password}.{_configuration["Secret:PasswordSalt"]}");
 
             await _unitOfWork.Users.AddAsync(user); 
             return await _unitOfWork.Commit();
@@ -65,7 +68,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 .FindBy(us => us.Email.Equals(email), us => us.Role)
                 .FirstOrDefaultAsync();
 
-            return user == null ? _mapper.Map<UserDto>(user) : null;
+            return user != null ? _mapper.Map<UserDto>(user) : null;
         }
 
         private string CreateMd5(string password)

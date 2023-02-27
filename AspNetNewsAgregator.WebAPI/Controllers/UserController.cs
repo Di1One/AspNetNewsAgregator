@@ -2,7 +2,9 @@
 using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.WebAPI.Models.Requests;
+using AspNetNewsAgregator.WebAPI.Utils;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -16,13 +18,24 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly IMapper _mapper;
+        private readonly IJwtUtil _jwtUtil;
 
-        public UserController(IUserService userService, IRoleService roleService, IMapper mapper)
+        public UserController(IUserService userService, IRoleService roleService, IMapper mapper, IJwtUtil jwtUtil)
         {
             _userService = userService;
             _roleService = roleService;
             _mapper = mapper;
+            _jwtUtil = jwtUtil;
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Get()
+        {
+            var users = await _userService.GetAllUsers();
+            return Ok(users);
+        }
+
 
         /// <summary>
         /// Register user
@@ -44,11 +57,15 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
                     && request.Password.Equals(request.PasswordConfirmation))
                 {
                     userDto.RoleId = userRoleId.Value;
-                    var result = await _userService.RegisterUser(userDto);
+                    var result = await _userService.RegisterUser(userDto, request.Password);
 
                     if (result > 0)
                     {
-                        return Ok();
+                        var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
+
+                        var response = _jwtUtil.GenerateToken(userInDbDto);
+
+                        return Ok(response);
                     }
                 }
 

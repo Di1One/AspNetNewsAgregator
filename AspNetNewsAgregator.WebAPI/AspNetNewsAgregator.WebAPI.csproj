@@ -38,8 +38,4 @@
     <ProjectReference Include="..\AspNetNewsAgregator.DataBase\AspNetNewsAgregator.DataBase.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Responces\" />
-  </ItemGroup>
-
 </Project>

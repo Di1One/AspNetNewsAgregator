@@ -7,17 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Handlers\QueryHandlers\" />
+    <Folder Include="Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="MediatR" Version="12.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AspNetNewsAgregator.Core\AspNetNewsAgregator.Core.csproj" />
-    <ProjectReference Include="..\AspNetNewsAgregator.Data.Abstractions\AspNetNewsAgregator.Data.Abstractions.csproj" />
-    <ProjectReference Include="..\AspNetNewsAgregator.Data.CQS\AspNetNewsAgregator.Data.CQS.csproj" />
     <ProjectReference Include="..\AspNetNewsAgregator.DataBase\AspNetNewsAgregator.DataBase.csproj" />
   </ItemGroup>
 

@@ -16,6 +16,10 @@ using HtmlAgilityPack;
 using System.Xml.Linq;
 using AspNetNewsAgregator.Business.Models;
 using Newtonsoft.Json;
+using System.Linq;
+using MediatR;
+using AspNetNewsAgregator.Data.CQS.Commands;
+using AspNetNewsAgregator.Data.CQS.Queries;
 
 namespace AspNetNewsAgregator.Business.ServicesImplementations
 {
@@ -24,12 +28,14 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMediator _mediator;
 
-        public ArticleService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork)
+        public ArticleService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork, IMediator mediator)
         {
             _mapper = mapper;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _mediator = mediator;
         }
 
         public async Task<List<ArticleDto>> GetArticlesByPageNumberAndPageSizeAsync(int pageNumber, int pageSize)
@@ -90,9 +96,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
         public async Task<ArticleDto> GetArticleByIdAsync(Guid id)
         {
-            var entity = await _unitOfWork.Articles.GetByIdAsync(id);
-            var dto = _mapper.Map<ArticleDto>(entity);
-
+            var dto = await _mediator.Send(new GetArticleByIdQuery() { Id = id });
             return dto;
         }
 
@@ -137,14 +141,14 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
         public async Task AddArticleTextToArticlesAsync()
         {
-            var articlesWithEmptyTextIds = _unitOfWork.Articles.Get()
-                .Where(article => string.IsNullOrEmpty(article.Text))
-                .Select(article => article.Id)
-                .ToList();
+            var articlesWithEmptyTextIds = await _mediator.Send(new GetArticleWithoutTextIdsQuery());
 
-            foreach (var articleId in articlesWithEmptyTextIds)
+            if (articlesWithEmptyTextIds != null)
             {
-                await AddArticleTextToArticleAsync(articleId);
+                foreach (var articleId in articlesWithEmptyTextIds)
+                {
+                    await AddArticleTextToArticleAsync(articleId);
+                }
             }
         }
 
@@ -183,6 +187,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
             Parallel.ForEach(sources, (source) => GetAllArticleDataFromRssAsync(source.Id, source.RssUrl).Wait());
         }
+
         private async Task GetAllArticleDataFromRssAsync(Guid sourceId, string? sourceRssUrl)
         {
             if (!string.IsNullOrEmpty(sourceRssUrl))
@@ -193,34 +198,22 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                 {
                     var feed = SyndicationFeed.Load(reader);
 
-                    foreach (var item in feed.Items)
+                    list.AddRange(feed.Items.Select(item => new ArticleDto()   //should be checked for different rss sources (Onliner)
                     {
-                        //should be checked for different rss sources (Onliner)
-                        var articleDto = new ArticleDto()
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = item.Title.Text,
-                            PublicationDate = item.PublishDate.UtcDateTime,
-                            ShortSummary = item.Summary.Text,
-                            Category = item.Categories.FirstOrDefault()?.Name,
-                            SourceId = sourceId,
-                            SourceUrl = item.Id
-                        };
-
-                        list.Add(articleDto);
-                    }
+                        Id = Guid.NewGuid(),
+                        Title = item.Title.Text,
+                        PublicationDate = item.PublishDate.UtcDateTime,
+                        ShortSummary = item.Summary.Text,
+                        Category = item.Categories.FirstOrDefault()?.Name,
+                        SourceId = sourceId,
+                        SourceUrl = item.Id
+                    }));
                 }
 
-                var oldArticleUrls = await _unitOfWork.Articles.Get()
-                    .Select(article => article.SourceUrl)
-                    .Distinct()
-                    .ToArrayAsync();
-
-                var entities = list.Where(dto => !oldArticleUrls.Contains(dto.SourceUrl))
-                    .Select(dto => _mapper.Map<Article>(dto)).ToArray();
-
-                await _unitOfWork.Articles.AddRangeAsync(entities);
-                await _unitOfWork.Commit();
+                await _mediator.Send(new AddArticleDataFromRssFeedCommand()
+                {
+                    Articles = list
+                });
             }
         }
 
@@ -256,8 +249,7 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
                         .Select(node => node.OuterHtml)
                         .Aggregate((i, j) => i + Environment.NewLine + j);
 
-                    await _unitOfWork.Articles.UpdateArticleTextAsync(articleId, articleText);
-                    await _unitOfWork.Commit();
+                    await _mediator.Send(new UpdateArticleTextCommand() { Id = articleId, Text = articleText });
                 }
             }
             catch (Exception e)

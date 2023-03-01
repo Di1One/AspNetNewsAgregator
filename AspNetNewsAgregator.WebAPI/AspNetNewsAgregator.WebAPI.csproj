@@ -14,6 +14,7 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.33" />
     <PackageReference Include="Hangfire.Core" Version="1.7.33" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.33" />
+    <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.2">
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspNetNewsAgregator.Business\AspNetNewsAgregator.Business.csproj" />
     <ProjectReference Include="..\AspNetNewsAgregator.Core\AspNetNewsAgregator.Core.csproj" />
+    <ProjectReference Include="..\AspNetNewsAgregator.Data.CQS\AspNetNewsAgregator.Data.CQS.csproj" />
     <ProjectReference Include="..\AspNetNewsAgregator.Data.Repositoires\AspNetNewsAgregator.Data.Repositories.csproj" />
     <ProjectReference Include="..\AspNetNewsAgregator.DataBase\AspNetNewsAgregator.DataBase.csproj" />
   </ItemGroup>

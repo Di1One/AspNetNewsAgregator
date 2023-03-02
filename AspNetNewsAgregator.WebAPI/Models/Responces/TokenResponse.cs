@@ -6,5 +6,6 @@
         public string Role { get; set; }
         public Guid UserId { get; set; }
         public DateTime TokenExpiration { get; set; }
+        public Guid RefreshToken { get; internal set; }
     }
 }

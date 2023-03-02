@@ -11,4 +11,6 @@ public interface IUserService
     Task<bool> CheckUserPassword(Guid userId, string password);
     Task<int> RegisterUser(UserDto dto, string password);
     Task<UserDto?> GetUserByEmailAsync(string email);
+    //token service
+    Task<UserDto?> GetUserByRefreshTokenAsync(Guid token);
 }

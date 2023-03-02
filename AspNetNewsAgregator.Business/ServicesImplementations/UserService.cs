@@ -1,8 +1,10 @@
 ﻿using AspNetNewsAgregator.Core.Abstractions;
 using AspNetNewsAgregator.Core.DataTransferObjects;
 using AspNetNewsAgregator.Data.Abstractions;
+using AspNetNewsAgregator.Data.CQS.Queries;
 using AspNetNewsAgregator.DataBase.Entities;
 using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,12 +15,14 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMediator _mediator;
 
-        public UserService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork)
+        public UserService(IMapper mapper, IConfiguration configuration, IUnitOfWork unitOfWork, IMediator mediator)
         {
             _mapper = mapper;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _mediator = mediator;
         }
 
         public async Task<bool> IsUserExists(Guid userId)
@@ -82,6 +86,17 @@ namespace AspNetNewsAgregator.Business.ServicesImplementations
 
                 return Convert.ToHexString(hashByte);
             }
+        }
+
+        // token service
+        public async Task<UserDto?> GetUserByRefreshTokenAsync(Guid token)
+        {
+            var user = await _mediator.Send(new GetUserByRefreshTokenQuery()
+            {
+               RefreshToken = token
+            });
+
+            return user;
         }
     }
 }

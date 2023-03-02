@@ -63,7 +63,7 @@ namespace AspNetNewsAgregator.WebAPI.Controllers
                     {
                         var userInDbDto = await _userService.GetUserByEmailAsync(userDto.Email);
 
-                        var response = _jwtUtil.GenerateToken(userInDbDto);
+                        var response = await _jwtUtil.GenerateTokenAsync(userInDbDto);
 
                         return Ok(response);
                     }

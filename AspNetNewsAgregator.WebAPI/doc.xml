@@ -171,6 +171,20 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.TokenController.RefreshToken(AspNetNewsAgregator.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AspNetNewsAgregator.WebAPI.Controllers.TokenController.RevokeToken(AspNetNewsAgregator.WebAPI.Models.Requests.RefreshTokenRequestModel)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:AspNetNewsAgregator.WebAPI.Controllers.UserController.Create(AspNetNewsAgregator.WebAPI.Models.Requests.RegisterUserRequestModel)">
             <summary>
             Register user

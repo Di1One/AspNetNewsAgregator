@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AspNetNewsAgregator.Data.Abstractions": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61233;http://localhost:61234"
+    }
+  }
+}
